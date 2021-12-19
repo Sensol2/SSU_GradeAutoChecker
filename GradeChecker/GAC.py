@@ -34,6 +34,8 @@ def Login(self, driver, id, password):
     WaitForClass_CanBeClicked(driver, 10, "btn_login")
     driver.find_element_by_class_name('btn_login').click()
 
+
+    WaitForClass_Visible(driver,10,"tit")
     #ID, PW 필드 채우기
     driver.find_element_by_xpath('//*[@id="userid"]').send_keys(id)
     driver.find_element_by_xpath('//*[@id="pwd"]').send_keys(password)
@@ -85,23 +87,27 @@ def CheckGrade(self, driver):
     print(gradeText)
     self.signal_AddLogMessage.emit(gradeText)
 
-    count = gradeText.count("★") # 등록된 성적 개수
+    # count = gradeText.count("★") # 등록된 성적 개수
 
-    gradeSum = 0
-    gradeSum += gradeText.count("A+") * 4.5
-    gradeSum += gradeText.count("A0") * 4.3
-    gradeSum += gradeText.count("A-") * 4.2
-    gradeSum += gradeText.count("B+") * 4.0
-    gradeSum += gradeText.count("B0") * 3.5
-    gradeSum += gradeText.count("B-") * 3.3
-    gradeSum += gradeText.count("C+") * 3.0
-    gradeSum += gradeText.count("C0") * 2.5
-    gradeSum += gradeText.count("C-") * 2.3
-    gradeSum += gradeText.count("D+") * 2.0
-    gradeSum += gradeText.count("D0") * 1.5
-    gradeSum += gradeText.count("D-") * 1.3
-    gradeSum += gradeText.count("D-") * 1.0
-    self.signal_AddLogMessage.emit(f"현재 학점 평균은 {gradeSum / count} 입니다.")
+    # gradeSum = 0
+    # gradeSum += gradeText.count("A+") * 4.5
+    # gradeSum += gradeText.count("A0") * 4.3
+    # gradeSum += gradeText.count("A-") * 4.2
+    # gradeSum += gradeText.count("B+") * 4.0
+    # gradeSum += gradeText.count("B0") * 3.5
+    # gradeSum += gradeText.count("B-") * 3.3
+    # gradeSum += gradeText.count("C+") * 3.0
+    # gradeSum += gradeText.count("C0") * 2.5
+    # gradeSum += gradeText.count("C-") * 2.3
+    # gradeSum += gradeText.count("D+") * 2.0
+    # gradeSum += gradeText.count("D0") * 1.5
+    # gradeSum += gradeText.count("D-") * 1.3
+    # gradeSum += gradeText.count("D-") * 1.0
+
+    # if count > 0:
+    #     self.signal_AddLogMessage.emit(f"현재 학점 평균은 {gradeSum / count} 입니다.")
+    # else:
+    #     self.signal_AddLogMessage.emit("현재 등록된 성적이 없습니다.")
 
 def mainFunc(self):
     # =====드라이버 및 옵션 생성=====
@@ -129,9 +135,15 @@ def mainFunc(self):
         Login(self, driver, self.id, self.pw)
     except:
         self.signal_AddLogMessage.emit("! 로그인에 실패하였습니다")
+        driver.quit()
         return
 
-    CheckGrade(self, driver)
+    try:
+        CheckGrade(self, driver)
+    except:
+        self.signal_AddLogMessage.emit("! 성적 확인 도중 문제가 발생했습니다.")
+        driver.quit()
+        return
     driver.quit()
 
 
