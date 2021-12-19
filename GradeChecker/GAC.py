@@ -129,6 +129,7 @@ def mainFunc(self):
         Login(self, driver, self.id, self.pw)
     except:
         self.signal_AddLogMessage.emit("! 로그인에 실패하였습니다")
+        return
 
     CheckGrade(self, driver)
     driver.quit()
