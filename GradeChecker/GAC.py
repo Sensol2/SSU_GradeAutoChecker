@@ -71,13 +71,14 @@ def CheckGrade(self, driver):
     iframes = driver.find_elements_by_tag_name('iframe')
     # iframe 내부에 iframe이 있어서, 두 번 프레임을 바꿔줌
     driver.switch_to.default_content()
-    driver.switch_to.frame(iframes[3])
+    driver.switch_to.frame('contentAreaFrame')
     driver.switch_to.frame('isolatedWorkArea')
     # print(driver.page_source)
-    # print(driver.find_element_by_id('WD38-content').text)
-    WaitForID_Visible(driver, 10, 'WD01A4-content')
 
-    gradeText = driver.find_element_by_id('WD01A4-content').text
+    WaitForClass_Visible(driver, 10, 'urSTSStd')
+    gradeTexts = driver.find_elements_by_class_name('urSTSStd')     # gradeTexts[0]은 석차정보, [1]은 현재학기 성적ㄴ
+    print(gradeTexts[1].text)
+    gradeText = gradeTexts[1].text
     characters = ["이수학년도", "이수학기", "과목코드", "과목명", "과목학점", "성적", "등급", "교수명", "비고", "상세"]
     for ch in characters:
         gradeText = gradeText.replace(ch, "")
@@ -87,7 +88,7 @@ def CheckGrade(self, driver):
     print(gradeText)
     self.signal_AddLogMessage.emit(gradeText)
 
-    # count = gradeText.count("★") # 등록된 성적 개수
+    count = gradeText.count("★") # 등록된 성적 개수
 
     # gradeSum = 0
     # gradeSum += gradeText.count("A+") * 4.5
@@ -140,8 +141,8 @@ def mainFunc(self):
 
     try:
         CheckGrade(self, driver)
-    except:
-        self.signal_AddLogMessage.emit("! 성적 확인 도중 문제가 발생했습니다.")
+    except Exception as e:
+        self.signal_AddLogMessage.emit(f"! 성적 확인 도중 문제가 발생했습니다. {e}")
         driver.quit()
         return
     driver.quit()
